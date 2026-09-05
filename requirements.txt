@@ -1,4 +1,5 @@
 anyio==4.14.2
+arch==8.0.0
 argon2-cffi==25.1.0
 argon2-cffi-bindings==26.1.0
 arrow==1.4.0

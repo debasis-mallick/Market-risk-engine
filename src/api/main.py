@@ -3,7 +3,14 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+
+
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("market_risk_api")
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
 from models.anomaly_isolation_forest import fit_isolation_forest, add_anomaly_scores
@@ -14,6 +21,18 @@ app = FastAPI(
     description="API for anomaly detection and volatility forecasting on equity data",
     version="1.0.0",
 )
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    start_time = time.time()
+    logger.info(f"Incoming request: {request.method} {request.url.path}")
+
+    response = await call_next(request)
+
+    duration = time.time() - start_time
+    logger.info(f"Completed: {request.method} {request.url.path} — status {response.status_code} — {duration:.3f}s")
+
+    return response
 
 PROCESSED_DIR = Path(__file__).resolve().parents[2] / "data" / "processed"
 AVAILABLE_TICKERS = ["AAPL", "MSFT", "GOOGL", "TSLA"]
@@ -37,7 +56,10 @@ def load_ticker_data(ticker: str) -> pd.DataFrame:
 
 
 @app.get("/anomalies/{ticker}")
-def get_anomalies(ticker: str, contamination: float = 0.05):
+def get_anomalies(
+    ticker: str,
+    contamination: float = Query(default=0.05, ge=0.01, le=0.5, description="Expected proportion of anomalies (0.01-0.5)"),
+):
     """
     Return flagged anomalous trading days for a given ticker using
     Isolation Forest.
@@ -66,7 +88,10 @@ def get_anomalies(ticker: str, contamination: float = 0.05):
 
 
 @app.get("/predict/{ticker}")
-def predict_volatility(ticker: str, horizon: int = 5):
+def predict_volatility(
+    ticker: str,
+    horizon: int = Query(default=5, ge=1, le=30, description="Forecast horizon in days (1-30)"),
+):
     """
     Forecast next-day (and up to `horizon` days ahead) volatility for a
     given ticker using GARCH(1,1).

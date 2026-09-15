@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pandas
+numpy
+scipy
+scikit-learn
+statsmodels
+arch
+filterpy
+pywavelets
+torch
+pydantic

@@ -23,20 +23,19 @@ def fetch_ticker(ticker: str, period: str = "2y", interval: str = "1d", max_retr
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
 
-                before = len(df)
-                df = df.dropna(subset=["Open", "High", "Low", "Close"])
-                dropped = before - len(df)
+            before = len(df)
+            df = df.dropna(subset=["Open", "High", "Low", "Close"])
+            dropped = before - len(df)
             if dropped > 0:
                 logger.info(f"Dropped {dropped} incomplete row(s) for {ticker}")
 
+            df.attrs["ticker"] = ticker
+            return df
 
-                df.attrs["ticker"] = ticker
-                return df
-            
         except Exception as e:
             logger.warning(f"Attempt {attempt} failed for {ticker}: {e}")
             if attempt < max_retries:
-                time.sleep(2 * attempt)  # exponential-ish backoff
+                time.sleep(2 * attempt)
             else:
                 logger.error(f"All {max_retries} attempts failed for {ticker}")
                 raise

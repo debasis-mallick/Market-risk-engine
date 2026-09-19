@@ -10,3 +10,4 @@ filterpy
 pywavelets
 torch
 pydantic
+yfinance

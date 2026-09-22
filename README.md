@@ -2,6 +2,12 @@
 
 An end-to-end system that ingests market data, applies signal-processing techniques to separate trend from noise, detects anomalous trading behavior using unsupervised ML, and forecasts short-term volatility — served via a tested, containerized, CI/CD-enabled API.
 
+
+🔗 **Live demo**: https://market-risk-engine-aowv.onrender.com/docs
+*(Free-tier hosting — the service spins down after 15 minutes of inactivity; the first request after that may take 30-60 seconds to wake up.)*
+
+
+
 ## Why this project
 
 Most portfolio ML projects stop at a notebook with a trained model. This one goes further: every finding is **cross-validated across multiple independent methods**, every model is **compared against honest baselines** (including cases where the simpler model wins), and the whole pipeline is **productionized** — tested, containerized, continuously integrated, and self-refreshing.

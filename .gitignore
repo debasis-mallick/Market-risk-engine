@@ -3,9 +3,7 @@ __pycache__/
 .venv/
 venv/
 data/raw/*
-data/processed/*
 !data/raw/.gitkeep
-!data/processed/.gitkeep
 .env
 *.log
 .ipynb_checkpoints/
